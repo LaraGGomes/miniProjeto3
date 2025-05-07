@@ -9,7 +9,7 @@ def create_bd():
             """
             CREATE TABLE IF NOT EXISTS users (
                 users_id    VARCHAR(31) PRIMARY KEY,
-                senha       INT NOT NULL
+                senha       VARCHAR(40) NOT NULL
             );
             """
         )
@@ -19,7 +19,7 @@ def create_bd():
             CREATE TABLE IF NOT EXISTS posts (
                 post_id     SERIAL PRIMARY KEY,
                 users       VARCHAR(31),
-                post        TEXT
+                post        TEXT,
 
                 FOREIGN KEY (users) REFERENCES users(users_id)
             );
@@ -33,7 +33,7 @@ def create_bd():
                 users       VARCHAR(31),
                 like        BOOL, 
 
-                PRIMARY KEY (post), users),
+                PRIMARY KEY (post, users),
                 FOREIGN KEY (users) REFERENCES users(users_id),
                 FOREIGN KEY (post)  REFERENCES posts(post_id)
             );
