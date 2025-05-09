@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, UniqueConst
 from sqlalchemy.orm import relationship
 from .database import Base
 
-# Modelos SQLAlchemy
+
 User_Post_association = Table(
     'user_post', Base.metadata,
     Column('user_id', Integer, ForeignKey('users.id')),
