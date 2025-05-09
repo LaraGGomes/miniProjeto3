@@ -22,7 +22,7 @@ def get_post(db: db_dependency, user: user_dependency, post_id: int):
 def get_posts(db: db_dependency, user: user_dependency):
     return db.query(Post).all()
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def creat_workout(db: db_dependency, user: user_dependency, post: PostCreate):
+def creat_post(db: db_dependency, user: user_dependency, post: PostCreate):
     db_posts = Post(**post.model_dump,user_id= user.get('id'))
     db.add(db_posts)
     db.commit()
@@ -30,7 +30,7 @@ def creat_workout(db: db_dependency, user: user_dependency, post: PostCreate):
     return db_posts
 
 @router.delete("/")
-def delete_workout(db: db_dependency, user: user_dependency, post_id: int):
+def delete_post(db: db_dependency, user: user_dependency, post_id: int):
     db_posts = db.query(Post).filter(Post.id == post_id).first()
     if db_posts:
         db.delete(db_posts)

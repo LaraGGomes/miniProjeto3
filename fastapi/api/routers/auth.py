@@ -7,7 +7,7 @@ from jose import jwt
 from dotenv import load_dotenv
 import os
 from api.model import User
-from api.deps import db_dependency,bcrypt_context
+from api.deps import db_dependency, bcrypt_context
 
 
 load_dotenv()
@@ -46,7 +46,7 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
 async def create_user(db: db_dependency, create_user_request: UserCreateRequest):
     create_user_model = User(
         username=create_user_request.username,
-        hashed_password=bcrypt_context.hash(create_user_request.password),
+        hashed_password=bcrypt_context.hash(create_user_request.password)
     )
     db.add(create_user_model)
     db.commit()
