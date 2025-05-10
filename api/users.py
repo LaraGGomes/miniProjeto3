@@ -1,4 +1,5 @@
 import os
+import uuid
 from datetime import timedelta, datetime, timezone
 from typing import Annotated
 
@@ -38,8 +39,7 @@ def authenticate_user(username: str, password: str, db):
     if not user:
         raise HTTPException(status_code=404, detail=f'User {username} not found')
 
-    hashed_password = get_password_hash(user.password)
-    if not verify_password(password, hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user
 
@@ -54,6 +54,7 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
 @user_router.post("/register")
 async def create_user(*, user: UserRegister, session: session_deps):
     user_db = User.model_validate(user)
+    user_db.password = get_password_hash(user_db.password)
 
     statement = select(User).where(User.name == user_db.name)
     results = session.exec(statement).first()
@@ -82,16 +83,38 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sess
     return token
 
 
-@user_router.get("/me")
-async def get_current_user(token: oauth2_bearer_dependency):
+def get_current_user(token: str = Depends(oauth2_bearer)) -> uuid.UUID:
     try:
         payload = jwt.decode(token, secret_key, algorithms=[auth_algorithm])
-        username: str = payload.get('sub')
-        user_id: int = payload.get('id')
+        user_id = payload.get("id")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return uuid.UUID(user_id)
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
-        if username is None or user_id is None:
-            raise HTTPException(status_code=401, detail="Couldn't validate user")
-        return {'username': username, 'id': user_id}
+
+@user_router.get("/me")
+async def get_me(token: oauth2_bearer_dependency, session: session_deps):
+    try:
+        user_id = get_current_user(token)
+        if not user_id:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        statement = select(User).where(User.id == user_id)
+        user = session.exec(statement).first()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user = {
+            "id": user.id,
+            "username": user.username,
+            "name": user.name,
+            "profile_image": user.profile_image,
+        }
+
+        return user
 
     except JWTError:
         raise HTTPException(status_code=401, detail="Couldn't validate user")

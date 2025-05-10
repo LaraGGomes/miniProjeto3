@@ -31,6 +31,10 @@ class UserRegister(SQLModel):
     password: str
 
 
+class CreatePost(SQLModel):
+    content: str
+
+
 engine = create_engine("sqlite:///fuckerberg.db", echo=True)
 
 
