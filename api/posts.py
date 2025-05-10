@@ -56,3 +56,23 @@ async def edit_post(
     session.refresh()
 
     return post_db.id
+
+
+@post_router.delete("/{post_id}")
+async def edit_post(
+        session: session_deps,
+        current_user: Annotated[uuid.UUID, Depends(get_current_user)],
+        post_id: uuid.UUID,
+):
+    post_db = session.get(Post, post_id)
+
+    if not post_db:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    if post_db.author != current_user:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this post")
+
+    session.delete(post_db)
+    session.commit()
+
+    return post_db.id
