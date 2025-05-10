@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import Depends
@@ -18,12 +19,22 @@ class Post(SQLModel, table=True):
     content: str
     author: uuid.UUID = Field(foreign_key="user.id")
     like_count: int = Field(default=0)
+    created_at: datetime = Field(default_factory=datetime.now)
 
 
 class LikedPost(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     post_id: uuid.UUID = Field(foreign_key="post.id")
     user_id: uuid.UUID = Field(foreign_key="user.id")
+
+
+class AuthenticatedPost(SQLModel):
+    id: uuid.UUID
+    content: str
+    name: str
+    profile_image: str | None
+    liked: bool
+    created_at: datetime
 
 
 class UserRegister(SQLModel):

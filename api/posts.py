@@ -2,9 +2,9 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Depends
-from sqlmodel import select
+from sqlmodel import select, case
 
-from database import CreateUpdatePost, session_deps, Post
+from database import CreateUpdatePost, session_deps, Post, User, LikedPost, AuthenticatedPost
 from users import get_current_user
 
 post_router = APIRouter()
@@ -36,6 +36,34 @@ async def create_post(*, post: CreateUpdatePost, session: session_deps,
 
 
 @post_router.get("/")
+async def get_posts(
+        session: session_deps,
+        current_user: Annotated[uuid.UUID, Depends(get_current_user)]
+):
+    stmt = (
+        select(
+            Post.id,
+            Post.content,
+            Post.created_at,
+            User.name,
+            User.profile_image,
+            case(
+                (LikedPost.id.is_not(None), True),
+                else_=False
+            ).label("liked")
+        )
+        .select_from(Post)
+        .outerjoin(
+            LikedPost,
+            (LikedPost.post_id == Post.id) & (LikedPost.user_id == current_user)
+        )
+        .outerjoin(User, Post.author == User.id)
+    )
+    results = session.exec(stmt).all()
+    return [AuthenticatedPost(**row._asdict()) for row in results]
+
+
+@post_router.get("/me")
 async def get_my_posts(
         session: session_deps,
         current_user: Annotated[uuid.UUID, Depends(get_current_user)]

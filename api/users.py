@@ -56,7 +56,7 @@ async def create_user(*, user: UserRegister, session: session_deps):
     user_db = User.model_validate(user)
     user_db.password = get_password_hash(user_db.password)
 
-    statement = select(User).where(User.name == user_db.name)
+    statement = select(User).where(User.username == user_db.username)
     results = session.exec(statement).first()
 
     if results:

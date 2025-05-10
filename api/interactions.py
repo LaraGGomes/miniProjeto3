@@ -21,9 +21,6 @@ async def like_post(
     if not post_db:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    if post_db.author != current_user:
-        raise HTTPException(status_code=403, detail="Not authorized to edit this post")
-
     like = session.exec(
         select(LikedPost).where(
             LikedPost.user_id == current_user,
