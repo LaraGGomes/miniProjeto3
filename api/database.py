@@ -23,6 +23,7 @@ class Post(SQLModel, table=True):
 class LikedPost(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     post_id: uuid.UUID = Field(foreign_key="post.id")
+    user_id: uuid.UUID = Field(foreign_key="user.id")
 
 
 class UserRegister(SQLModel):

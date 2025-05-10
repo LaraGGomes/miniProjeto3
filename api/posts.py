@@ -10,6 +10,15 @@ from users import get_current_user
 post_router = APIRouter()
 
 
+@post_router.get("/feed")
+async def get_feed(
+        session: session_deps,
+):
+    statement = select(Post)
+    posts = session.exec(statement).all()
+    return posts
+
+
 @post_router.post("/")
 async def create_post(*, post: CreateUpdatePost, session: session_deps,
                       current_user: Annotated[uuid.UUID, Depends(get_current_user)]):
