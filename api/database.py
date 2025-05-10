@@ -27,6 +27,7 @@ class LikedPost(SQLModel, table=True):
 
 class UserRegister(SQLModel):
     name: str
+    username: str
     password: str
 
 
