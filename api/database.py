@@ -7,7 +7,8 @@ from sqlmodel import SQLModel, Field, Session, create_engine
 
 class User(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str = Field(default=None, unique=True)
+    name: str = Field(default=None)
+    username: str = Field(default=None, unique=True)
     password: str
     profile_image: str | None = Field(default=None, nullable=True)
 
