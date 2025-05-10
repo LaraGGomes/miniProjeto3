@@ -31,7 +31,7 @@ class UserRegister(SQLModel):
     password: str
 
 
-class CreatePost(SQLModel):
+class CreateUpdatePost(SQLModel):
     content: str
 
 
