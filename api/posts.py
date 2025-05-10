@@ -47,6 +47,7 @@ async def get_posts(
             Post.created_at,
             User.name,
             User.profile_image,
+            User.username,
             case(
                 (LikedPost.id.is_not(None), True),
                 else_=False

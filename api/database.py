@@ -28,10 +28,19 @@ class LikedPost(SQLModel, table=True):
     user_id: uuid.UUID = Field(foreign_key="user.id")
 
 
+class LikedBy(SQLModel):
+    id: int | None = Field(default=None, primary_key=True)
+    post_id: uuid.UUID = Field(foreign_key="post.id")
+    profile_image: str | None
+    username: str
+    name: str
+
+
 class AuthenticatedPost(SQLModel):
     id: uuid.UUID
     content: str
     name: str
+    username: str
     profile_image: str | None
     liked: bool
     created_at: datetime
